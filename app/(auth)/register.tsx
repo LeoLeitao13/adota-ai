@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { cadastrarAdotante, cadastrarONG } from '../../services/auth';
+import { mensagemErroFirebase } from '../../services/firebase-errors';
 import {
   aplicarMascaraCNPJ,
   aplicarMascaraTelefone,
@@ -20,6 +21,10 @@ import {
   validarSenha,
   validarTelefone,
 } from '../../services/validacoes';
+import { Chip } from '../../components/Chip';
+import { Toggle } from '../../components/Toggle';
+import { formStyles } from '../../constants/formStyles';
+import { theme } from '../../constants/theme';
 import type {
   Especie,
   EspacoNecessario,
@@ -132,7 +137,7 @@ export default function RegisterScreen() {
         router.replace('/(ong)/dashboard');
       }
     } catch (e) {
-      setErro(mensagemErroCadastro(e));
+      setErro(mensagemErroFirebase(e, 'cadastro'));
     } finally {
       setCarregando(false);
     }
@@ -140,12 +145,12 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={formStyles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.titulo}>Criar conta</Text>
+      <Text style={formStyles.titulo}>Criar conta</Text>
 
-      <Text style={styles.label}>Sou…</Text>
+      <Text style={formStyles.label}>Sou…</Text>
       <View style={styles.tipoSelector}>
         <TouchableOpacity
           style={tipo === 'adotante' ? styles.tipoBotaoAtivo : styles.tipoBotao}
@@ -191,17 +196,17 @@ export default function RegisterScreen() {
       </View>
 
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder="Nome"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         value={nome}
         onChangeText={setNome}
         editable={!carregando}
       />
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder="E-mail"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
@@ -210,9 +215,9 @@ export default function RegisterScreen() {
         editable={!carregando}
       />
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder={`Senha (mín. ${SENHA_MIN} caracteres)`}
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
@@ -221,8 +226,8 @@ export default function RegisterScreen() {
 
       {tipo === 'adotante' ? (
         <View>
-          <Text style={styles.label}>Estilo de vida</Text>
-          <View style={styles.linha}>
+          <Text style={formStyles.label}>Estilo de vida</Text>
+          <View style={formStyles.linha}>
             {ESTILOS_VIDA.map((e) => (
               <Chip
                 key={e}
@@ -233,8 +238,8 @@ export default function RegisterScreen() {
             ))}
           </View>
 
-          <Text style={styles.label}>Moradia</Text>
-          <View style={styles.linha}>
+          <Text style={formStyles.label}>Moradia</Text>
+          <View style={formStyles.linha}>
             {MORADIAS.map((m) => (
               <Chip
                 key={m}
@@ -245,8 +250,10 @@ export default function RegisterScreen() {
             ))}
           </View>
 
-          <Text style={styles.label}>Tempo disponível (1 = pouco, 5 = muito)</Text>
-          <View style={styles.linha}>
+          <Text style={formStyles.label}>
+            Tempo disponível (1 = pouco, 5 = muito)
+          </Text>
+          <View style={formStyles.linha}>
             {NIVEIS_TEMPO.map((n) => (
               <Chip
                 key={n}
@@ -268,8 +275,8 @@ export default function RegisterScreen() {
             onChange={setTemAnimais}
           />
 
-          <Text style={styles.label}>Espécie preferida</Text>
-          <View style={styles.linha}>
+          <Text style={formStyles.label}>Espécie preferida</Text>
+          <View style={formStyles.linha}>
             {ESPECIES.map((e) => (
               <Chip
                 key={e}
@@ -280,8 +287,8 @@ export default function RegisterScreen() {
             ))}
           </View>
 
-          <Text style={styles.label}>Porte preferido</Text>
-          <View style={styles.linha}>
+          <Text style={formStyles.label}>Porte preferido</Text>
+          <View style={formStyles.linha}>
             {PORTES.map((p) => (
               <Chip
                 key={p}
@@ -295,17 +302,17 @@ export default function RegisterScreen() {
       ) : (
         <View>
           <TextInput
-            style={styles.input}
+            style={formStyles.input}
             placeholder="Nome da ONG"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={theme.colors.placeholder}
             value={nomeOng}
             onChangeText={setNomeOng}
             editable={!carregando}
           />
           <TextInput
-            style={styles.input}
+            style={formStyles.input}
             placeholder="CNPJ (XX.XXX.XXX/XXXX-XX)"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={theme.colors.placeholder}
             keyboardType="numeric"
             value={cnpj}
             onChangeText={(v) => setCnpj(aplicarMascaraCNPJ(v))}
@@ -313,9 +320,9 @@ export default function RegisterScreen() {
             maxLength={18}
           />
           <TextInput
-            style={styles.input}
+            style={formStyles.input}
             placeholder="Telefone (XX) XXXXX-XXXX"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={theme.colors.placeholder}
             keyboardType="phone-pad"
             value={telefone}
             onChangeText={(v) => setTelefone(aplicarMascaraTelefone(v))}
@@ -325,225 +332,71 @@ export default function RegisterScreen() {
         </View>
       )}
 
-      {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+      {erro ? <Text style={formStyles.erro}>{erro}</Text> : null}
 
       <TouchableOpacity
-        style={styles.botao}
+        style={formStyles.botao}
         onPress={handleSubmit}
         disabled={carregando}
       >
         {carregando ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.botaoTexto}>Cadastrar</Text>
+          <Text style={formStyles.botaoTexto}>Cadastrar</Text>
         )}
       </TouchableOpacity>
 
-      <Link href="/(auth)/login" style={styles.link}>
+      <Link href="/(auth)/login" style={formStyles.link}>
         Já tenho conta
       </Link>
     </ScrollView>
   );
 }
 
-type ChipProps = {
-  ativo: boolean;
-  texto: string;
-  onPress: () => void;
-};
-
-function Chip({ ativo, texto, onPress }: ChipProps) {
-  return (
-    <TouchableOpacity
-      style={ativo ? styles.chipAtivo : styles.chip}
-      onPress={onPress}
-    >
-      <Text style={ativo ? styles.chipTextoAtivo : styles.chipTexto}>
-        {texto}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-type ToggleProps = {
-  valor: boolean;
-  texto: string;
-  onChange: (v: boolean) => void;
-};
-
-function Toggle({ valor, texto, onChange }: ToggleProps) {
-  return (
-    <TouchableOpacity style={styles.toggle} onPress={() => onChange(!valor)}>
-      <View style={valor ? styles.checkboxAtivo : styles.checkbox} />
-      <Text style={styles.toggleTexto}>{texto}</Text>
-    </TouchableOpacity>
-  );
-}
-
-function mensagemErroCadastro(e: unknown): string {
-  if (typeof e === 'object' && e !== null && 'code' in e) {
-    const code = String((e as { code: unknown }).code);
-    if (code === 'auth/email-already-in-use') return 'Este e-mail já está cadastrado.';
-    if (code === 'auth/invalid-email') return 'E-mail inválido.';
-    if (code === 'auth/weak-password') return 'Senha muito fraca.';
-    if (code === 'auth/network-request-failed') {
-      return 'Falha de conexão. Verifique sua internet.';
-    }
-  }
-  return 'Não foi possível concluir o cadastro. Tente novamente.';
-}
-
 const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    paddingTop: 48,
-    paddingBottom: 48,
-    backgroundColor: '#FFFFFF',
-    flexGrow: 1,
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1C1C1E',
-    marginTop: 12,
-    marginBottom: 8,
-  },
   tipoSelector: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   tipoBotao: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    padding: theme.spacing.lg,
+    borderRadius: theme.radius.lg,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F7F7F8',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     alignItems: 'center',
   },
   tipoBotaoAtivo: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    padding: theme.spacing.lg,
+    borderRadius: theme.radius.lg,
     borderWidth: 2,
-    borderColor: '#FF7A59',
-    backgroundColor: '#FFF1EC',
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primaryLight,
     alignItems: 'center',
   },
   tipoTexto: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1C1C1E',
+    fontSize: theme.font.subtitle,
+    fontWeight: theme.weight.semibold,
+    color: theme.colors.text,
   },
   tipoTextoAtivo: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FF7A59',
+    fontSize: theme.font.subtitle,
+    fontWeight: theme.weight.bold,
+    color: theme.colors.primary,
   },
   tipoLegenda: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
+    fontSize: theme.font.caption,
+    color: theme.colors.muted,
+    marginTop: theme.spacing.xs,
     textAlign: 'center',
   },
   tipoLegendaAtiva: {
-    fontSize: 12,
-    color: '#FF7A59',
-    marginTop: 4,
+    fontSize: theme.font.caption,
+    color: theme.colors.primary,
+    marginTop: theme.spacing.xs,
     textAlign: 'center',
-  },
-  linha: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 10,
-    backgroundColor: '#F7F7F8',
-    color: '#1C1C1E',
-  },
-  erro: {
-    color: '#E11D48',
-    marginTop: 12,
-    marginBottom: 4,
-  },
-  botao: {
-    backgroundColor: '#FF7A59',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  botaoTexto: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  link: {
-    marginTop: 16,
-    marginBottom: 24,
-    textAlign: 'center',
-    color: '#FF7A59',
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F7F7F8',
-  },
-  chipAtivo: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#FF7A59',
-    backgroundColor: '#FF7A59',
-  },
-  chipTexto: {
-    color: '#1C1C1E',
-  },
-  chipTextoAtivo: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  toggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-  },
-  toggleTexto: {
-    color: '#1C1C1E',
-    fontSize: 14,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#FF7A59',
-    backgroundColor: 'transparent',
-  },
-  checkboxAtivo: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#FF7A59',
-    backgroundColor: '#FF7A59',
   },
 });
