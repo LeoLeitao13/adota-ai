@@ -12,6 +12,10 @@ import {
 import { useRouter } from 'expo-router';
 import { auth } from '../../services/firebase';
 import { cadastrarAnimal } from '../../services/animals';
+import { Chip } from '../../components/Chip';
+import { Toggle } from '../../components/Toggle';
+import { formStyles } from '../../constants/formStyles';
+import { theme } from '../../constants/theme';
 import type {
   Especie,
   EspacoNecessario,
@@ -125,22 +129,22 @@ export default function CadastrarAnimalScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={formStyles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.titulo}>Novo animal</Text>
+      <Text style={formStyles.titulo}>Novo animal</Text>
 
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder="Nome"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         value={nome}
         onChangeText={setNome}
         editable={!salvando}
       />
 
-      <Text style={styles.label}>Espécie</Text>
-      <View style={styles.linha}>
+      <Text style={formStyles.label}>Espécie</Text>
+      <View style={formStyles.linha}>
         {ESPECIES.map((e) => (
           <Chip
             key={e}
@@ -152,17 +156,17 @@ export default function CadastrarAnimalScreen() {
       </View>
 
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder="Idade em meses"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         keyboardType="numeric"
         value={idade}
         onChangeText={setIdade}
         editable={!salvando}
       />
 
-      <Text style={styles.label}>Porte</Text>
-      <View style={styles.linha}>
+      <Text style={formStyles.label}>Porte</Text>
+      <View style={formStyles.linha}>
         {PORTES.map((p) => (
           <Chip
             key={p}
@@ -173,8 +177,8 @@ export default function CadastrarAnimalScreen() {
         ))}
       </View>
 
-      <Text style={styles.label}>Energia (1 = calmo, 5 = agitado)</Text>
-      <View style={styles.linha}>
+      <Text style={formStyles.label}>Energia (1 = calmo, 5 = agitado)</Text>
+      <View style={formStyles.linha}>
         {NIVEIS_ENERGIA.map((n) => (
           <Chip
             key={n}
@@ -185,8 +189,8 @@ export default function CadastrarAnimalScreen() {
         ))}
       </View>
 
-      <Text style={styles.label}>Espaço necessário</Text>
-      <View style={styles.linha}>
+      <Text style={formStyles.label}>Espaço necessário</Text>
+      <View style={formStyles.linha}>
         {ESPACOS.map((e) => (
           <Chip
             key={e}
@@ -209,9 +213,9 @@ export default function CadastrarAnimalScreen() {
       />
 
       <TextInput
-        style={styles.input}
+        style={formStyles.input}
         placeholder="URL da foto (https://...)"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         autoCapitalize="none"
         autoCorrect={false}
         keyboardType="url"
@@ -223,24 +227,24 @@ export default function CadastrarAnimalScreen() {
       <TextInput
         style={styles.textarea}
         placeholder="Descrição"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={theme.colors.placeholder}
         multiline
         value={descricao}
         onChangeText={setDescricao}
         editable={!salvando}
       />
 
-      {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+      {erro ? <Text style={formStyles.erro}>{erro}</Text> : null}
 
       <TouchableOpacity
-        style={styles.botao}
+        style={formStyles.botao}
         onPress={handleSubmit}
         disabled={salvando}
       >
         {salvando ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color={theme.colors.white} />
         ) : (
-          <Text style={styles.botaoTexto}>Cadastrar animal</Text>
+          <Text style={formStyles.botaoTexto}>Cadastrar animal</Text>
         )}
       </TouchableOpacity>
 
@@ -255,163 +259,29 @@ export default function CadastrarAnimalScreen() {
   );
 }
 
-type ChipProps = {
-  ativo: boolean;
-  texto: string;
-  onPress: () => void;
-};
-
-function Chip({ ativo, texto, onPress }: ChipProps) {
-  return (
-    <TouchableOpacity
-      style={ativo ? styles.chipAtivo : styles.chip}
-      onPress={onPress}
-    >
-      <Text style={ativo ? styles.chipTextoAtivo : styles.chipTexto}>
-        {texto}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-type ToggleProps = {
-  valor: boolean;
-  texto: string;
-  onChange: (v: boolean) => void;
-};
-
-function Toggle({ valor, texto, onChange }: ToggleProps) {
-  return (
-    <TouchableOpacity style={styles.toggle} onPress={() => onChange(!valor)}>
-      <View style={valor ? styles.checkboxAtivo : styles.checkbox} />
-      <Text style={styles.toggleTexto}>{texto}</Text>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    paddingTop: 48,
-    paddingBottom: 48,
-    backgroundColor: '#FFFFFF',
-    flexGrow: 1,
-  },
-  titulo: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1C1C1E',
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  linha: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 10,
-    backgroundColor: '#F7F7F8',
-    color: '#1C1C1E',
-  },
   textarea: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
     padding: 14,
-    marginBottom: 10,
-    backgroundColor: '#F7F7F8',
-    color: '#1C1C1E',
+    marginBottom: theme.spacing.md - 2,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
     minHeight: 100,
     textAlignVertical: 'top',
   },
-  erro: {
-    color: '#E11D48',
-    marginTop: 12,
-  },
-  botao: {
-    backgroundColor: '#FF7A59',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  botaoTexto: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
   botaoSec: {
     padding: 14,
-    borderRadius: 8,
+    borderRadius: theme.radius.md,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: theme.spacing.sm,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: theme.colors.border,
   },
   botaoSecTexto: {
-    color: '#6B7280',
-    fontWeight: '600',
-    fontSize: 15,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F7F7F8',
-  },
-  chipAtivo: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#FF7A59',
-    backgroundColor: '#FF7A59',
-  },
-  chipTexto: {
-    color: '#1C1C1E',
-  },
-  chipTextoAtivo: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  toggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-  },
-  toggleTexto: {
-    color: '#1C1C1E',
-    fontSize: 14,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#FF7A59',
-    backgroundColor: 'transparent',
-  },
-  checkboxAtivo: {
-    width: 22,
-    height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#FF7A59',
-    backgroundColor: '#FF7A59',
+    color: theme.colors.muted,
+    fontWeight: theme.weight.semibold,
+    fontSize: theme.font.label + 2,
   },
 });
