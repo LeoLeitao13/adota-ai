@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { login } from '../../services/auth';
+import { mensagemErroFirebase } from '../../services/firebase-errors';
 import { theme } from '../../constants/theme';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,7 +64,7 @@ export default function LoginScreen() {
         router.replace('/(adotante)/home');
       }
     } catch (e) {
-      setErro(mensagemErroLogin(e));
+      setErro(mensagemErroFirebase(e, 'login'));
     } finally {
       setCarregando(false);
     }
@@ -143,29 +144,6 @@ export default function LoginScreen() {
       </Animated.View>
     </ScrollView>
   );
-}
-
-function mensagemErroLogin(e: unknown): string {
-  if (typeof e === 'object' && e !== null && 'code' in e) {
-    const code = String((e as { code: unknown }).code);
-    if (
-      code === 'auth/invalid-credential' ||
-      code === 'auth/wrong-password' ||
-      code === 'auth/user-not-found'
-    ) {
-      return 'E-mail ou senha incorretos.';
-    }
-    if (code === 'auth/too-many-requests') {
-      return 'Muitas tentativas. Tente novamente em alguns minutos.';
-    }
-    if (code === 'auth/network-request-failed') {
-      return 'Falha de conexão. Verifique sua internet.';
-    }
-    if (code === 'auth/invalid-email') {
-      return 'E-mail inválido.';
-    }
-  }
-  return 'Não foi possível entrar. Tente novamente.';
 }
 
 const styles = StyleSheet.create({
